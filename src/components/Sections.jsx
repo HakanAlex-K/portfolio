@@ -62,7 +62,8 @@ const experience = [
     points: [
       'Built 18 modules across quoting, CRM, inventory, and payments (React, Node.js, PostgreSQL).',
       'Cut quote preparation by ~85% with automated tax calculations and one-click PDFs.',
-      'Deployed with Docker; gathered requirements and trained staff.',
+      'Deployed with Docker; set up GitHub Actions CI with end-to-end tests against a disposable PostgreSQL database.',
+      'Gathered requirements, trained staff, and iterated on their feedback.',
     ],
   },
   {
