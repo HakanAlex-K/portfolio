@@ -1,0 +1,29 @@
+{
+  "name": "hakan-builds",
+  "private": true,
+  "version": "2.0.0",
+  "type": "module",
+  "description": "Hakan Alex Kucukhuseyin — portfolio site (React + Vite)",
+  "engines": {
+    "node": "22.x"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "check": "node tools/check-site.mjs",
+    "verify": "npm run build && npm run check"
+  },
+  "dependencies": {
+    "lucide-react": "^0.468.0",
+    "motion": "^12.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.4",
+    "playwright": "^1.64.0",
+    "sharp": "^0.35.5",
+    "vite": "^6.0.0"
+  }
+}

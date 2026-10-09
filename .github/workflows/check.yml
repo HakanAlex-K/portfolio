@@ -1,0 +1,30 @@
+name: Check portfolio
+
+# Vercel builds and deploys; this workflow verifies every change in a real browser.
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run verify
+      - name: Save browser screenshots
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: browser-check
+          path: test-results
