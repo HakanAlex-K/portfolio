@@ -1,48 +1,44 @@
-﻿# Hakan's portfolio
+# Portfolio
 
-Resume-aligned portfolio for Hakan Alex Kucukhuseyin: Electrical Engineering and Computer Engineering double major at Drexel, with a Finance minor. React 19, Vite, Motion, and Lucide. Static hosting; no backend required.
+My personal site. I'm an Electrical and Computer Engineering student at Drexel (Finance minor, class of 2028), and this is where I show the things I've built: a production platform for a yacht dealership, a wearable sensing prototype, a couple of full-stack web projects, and a computer built in Verilog.
 
-## Run and verify
+Built with React 19, Vite, Motion, and Lucide icons. It's a static site hosted on Vercel.
 
-Use Node 22.
+## Running it locally
+
+You'll need Node 22.
 
 ```sh
 npm ci
 npm run dev
 ```
 
-The development URL is http://127.0.0.1:4173. For a production build and browser checks:
+Then open http://127.0.0.1:4173.
+
+## Checks
+
+I wrote a Playwright script that builds the site and clicks through it at five screen widths: every project, the screenshot viewers, keyboard navigation, the résumé download, link-preview metadata, and console errors. It runs on every push through GitHub Actions.
 
 ```sh
 npx playwright install chromium
 npm run verify
 ```
 
-`npm run build` writes `dist`. `npm run preview` serves that build. `npm run check` starts a production preview and checks five viewport widths, all five projects, image and PDF loading, keyboard controls, dialogs, navigation, clipboard, reduced motion, hero pause, metadata, and browser errors. Screenshots and results go to `test-results/`.
+Screenshots from the run end up in `test-results/`.
 
-For an existing preview, set `CHECK_URL` to its URL and `SITE_BASE` to its path. `BROWSER_EXECUTABLE_PATH` optionally selects an installed Chromium browser. These settings are only needed for local verification.
+## Where things live
 
-## Deploy
+- `src/data/profile.js`: contact info, graduation, GPA, availability, links
+- `src/data/projects.js`: the project list
+- `src/components/Work.jsx`: the project write-ups and screenshot viewers
+- `src/components/Sections.jsx`: about, experience, and contact
+- `public/resume.pdf`: my current résumé
+- `tools/build-social-card.mjs`: regenerates the link-preview image (`node tools/build-social-card.mjs`)
 
-Hosted on Vercel; see [DEPLOYMENT.md](DEPLOYMENT.md). Pushes to `main` deploy to production, and GitHub Actions runs the browser check on every push and pull request.
+## A few notes on the content
 
-## Content sources
+- The Blues Yachting screenshots are from the real product, shared with permission. Customer names and figures are fictional.
+- The VitalView dashboard on the site is a later scikit-learn version of the project, running on synthetic signals. The original competition prototype used TensorFlow/Keras, and the site keeps the two separate.
+- UniTR screenshots use its sample dataset, so the rankings shown aren't official.
 
-`public/resume.pdf` is the user's supplied original PDF, copied without rewriting. It is the authoritative source for the name, email, education, dates, roles, project scope, and skills. Replace this file with the next approved resume; do not regenerate it from an old HTML template.
-
-- `src/data/profile.js`: name, contact, graduation, GPAs, availability, and external links. LinkedIn remains hidden because no URL was supplied.
-- `src/data/projects.js`: five project entries; four screenshot projects are featured in the hero preview.
-- `src/components/Sections.jsx`: education, skills, experience, and contact.
-- `src/components/Work.jsx`: project narratives, real screenshot viewers, and the Verilog computer architecture overview.
-- `src/lib/assets.js`: base-path-safe asset URLs, for hosting under a subpath.
-- `tools/build-social-card.mjs`: regenerates the committed social sharing image after profile changes (`node tools/build-social-card.mjs`).
-
-The supplied resume describes the original March-June 2025 glucose monitor with TensorFlow/Keras and 600-feature IR/red vectors. The public VitalView dashboard is a later scikit-learn iteration. The site labels that distinction and does not attribute later demo metrics to the original prototype. All dashboard captures use synthetic signals.
-
-Blues product screenshots are shown with permission and fictional customer identities. The production portal address is not published. UniTR screenshots use its sample fallback; custom rankings are not an official league table. The Hack computer visual is a conceptual architecture diagram, not a simulation capture.
-
-The existing Apr-Aug 2027 co-op availability and language/location preferences are retained from the site; the resume does not specify those preferences.
-
-## Local archives
-
-`reference/` contains older designs, the obsolete generated resume, unused assets, and capture helpers tied to local source projects. `shots/` contains working captures. Both are ignored by Git and excluded from deployment. The current site can build and be checked without these archives or any sibling repository.
+Deployment notes are in [DEPLOYMENT.md](DEPLOYMENT.md).
