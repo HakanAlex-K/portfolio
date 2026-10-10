@@ -2,7 +2,7 @@
 
 My personal site. I'm an Electrical and Computer Engineering student at Drexel (Finance minor, class of 2028), and this is where I show the things I've built: a production platform for a yacht dealership, a wearable sensing prototype, a couple of full-stack web projects, and a computer built in Verilog.
 
-Built with React 19, Vite, Motion, and Lucide icons. It's a static site hosted on Vercel.
+Built with React 19, Vite, Motion, and Lucide icons. The page is pre-rendered at build time, so the full content is in the HTML for anything that doesn't run JavaScript, and React takes over in the browser. Hosted on Vercel.
 
 ## Running it locally
 

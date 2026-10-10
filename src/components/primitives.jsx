@@ -3,9 +3,18 @@ import { animate, motion, useInView, useReducedMotion, useScroll, useTransform }
 import { X } from 'lucide-react';
 import { assetUrl } from '../lib/assets.js';
 
+/* The page is pre-rendered, where reduced motion can't be known. Report false until
+   mounted so the first client render matches the HTML, then follow the user's setting. */
+export function useReducedMotionSafe() {
+  const reduce = useReducedMotion();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  return mounted && reduce;
+}
+
 /* ---------- Reveal: fade + rise on scroll ---------- */
 export function Reveal({ children, delay = 0, y = 24, className, as = 'div', ...rest }) {
-  const reduce = useReducedMotion();
+  const reduce = useReducedMotionSafe();
   const Tag = motion[as] || motion.div;
   return (
     <Tag

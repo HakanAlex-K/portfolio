@@ -31,9 +31,24 @@ try {
   const context = await browser.newContext({viewport: {width: 1440, height: 1000}, reducedMotion: 'reduce', permissions: ['clipboard-read', 'clipboard-write']});
   const page = await context.newPage();
   page.on('pageerror', error => errors.push(error.message));
+  // React reports hydration mismatches (server HTML ≠ first client render) as console errors
+  page.on('console', message => { if (message.type() === 'error' && /hydrat/i.test(message.text())) errors.push(message.text()); });
   page.on('response', response => { if (new URL(response.url()).origin === new URL(url).origin && response.status() >= 400) failures.push(`${response.status()} ${response.url()}`); });
   page.on('dialog', async dialog => { errors.push(`Unexpected dialog: ${dialog.message()}`); await dialog.dismiss(); });
   await fs.mkdir('test-results', {recursive: true});
+
+  // Recruiter tools and AI screeners read the raw HTML without running JavaScript
+  const rawText = (await (await fetch(url)).text()).replace(/<script[\s\S]*?<\/script>|<style[\s\S]*?<\/style>/g, ' ').replace(/<[^>]+>/g, ' ');
+  for (const text of [...projects.map(p => p.shortName), '18 modules', '600 features', 'Event Coordinator', 'Dean’s List', 'Coursework', profile.email]) {
+    assert.ok(rawText.includes(text), `Pre-rendered HTML is missing "${text}"`);
+  }
+  const noJs = await browser.newContext({viewport: {width: 1440, height: 1000}, javaScriptEnabled: false});
+  const noJsPage = await noJs.newPage();
+  await noJsPage.goto(url);
+  for (const selector of ['#blues h4', '#about h2', '#experience li']) assert.ok(await noJsPage.locator(selector).first().isVisible(), `${selector} is visible without JavaScript`);
+  assert.equal(await noJsPage.locator('#blues .story-change').evaluate(el => getComputedStyle(el).opacity), '1', 'Animated content is shown without JavaScript');
+  await noJs.close();
+
   await page.goto(url);
   await page.locator('#hero-title').waitFor();
   await page.evaluate(() => Promise.race([document.fonts.ready, new Promise(resolve => setTimeout(resolve, 4000))]));
@@ -162,7 +177,7 @@ try {
   assert.deepEqual(errors, []);
   assert.deepEqual(failures, []);
   await fs.writeFile('test-results/checks.json', JSON.stringify({passed: true, basePath, projects: projects.map(p => p.id), widths: [1440, 1024, 768, 390, 320], errors, failures}, null, 2));
-  console.log(`PASS: résumé alignment, 5 projects, 5 widths, images, PDF, keyboard controls, navigation, clipboard, motion, metadata; base ${basePath}`);
+  console.log(`PASS: pre-rendered HTML, no-JS view, hydration, résumé alignment, 5 projects, 5 widths, images, PDF, keyboard controls, navigation, clipboard, motion, metadata; base ${basePath}`);
 } finally {
   await browser?.close();
   server?.kill();

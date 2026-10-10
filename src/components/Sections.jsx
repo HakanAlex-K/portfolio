@@ -127,6 +127,8 @@ export function Experience() {
                     </motion.ul>
                   )}
                 </AnimatePresence>
+                {/* Keep closed rows' details in the HTML for readers that don't run JavaScript */}
+                {!isOpen && <ul className="xp-body" hidden>{x.points.map((p) => <li key={p}>{p}</li>)}</ul>}
               </div>
             );
           })}
@@ -165,8 +167,10 @@ export function Contact() {
 const phillyTime = () => new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', hour: 'numeric', minute: '2-digit' }).format(new Date());
 
 function LocalTime() {
-  const [time, setTime] = useState(phillyTime);
+  // Empty in the pre-rendered HTML; the browser fills in the real time
+  const [time, setTime] = useState('');
   useEffect(() => {
+    setTime(phillyTime());
     const t = setInterval(() => setTime(phillyTime()), 15000);
     return () => clearInterval(t);
   }, []);
@@ -177,7 +181,7 @@ export function Footer() {
   return (
     <footer className="footer">
       <div className="container footer-inner">
-        <span>© {new Date().getFullYear()} {profile.name}</span>
+        <span suppressHydrationWarning>© {new Date().getFullYear()} {profile.name}</span>
         <LocalTime />
         <a href="#top">Back to top ↑</a>
       </div>

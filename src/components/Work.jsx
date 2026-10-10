@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { AnimatePresence, motion, useInView, useReducedMotion } from 'motion/react';
+import { AnimatePresence, motion, useInView } from 'motion/react';
 import { ArrowUpRight, ChevronDown, Github, Lock, Monitor, Pause, Play, Smartphone, Trophy } from 'lucide-react';
-import { Browser, Reveal, Shot } from './primitives.jsx';
+import { Browser, Reveal, Shot, useReducedMotionSafe } from './primitives.jsx';
 import { phones, screens } from '../data/blues.js';
 import { vvScreens } from '../data/vitalview-screens.js';
 import { assetUrl } from '../lib/assets.js';
@@ -18,7 +18,7 @@ function ProductViewer({ id, screens, phones, overlay, label }) {
   const [focused, setFocused] = useState(false);
   const ref = useRef(null);
   const inView = useInView(ref, { margin: '-20% 0px' });
-  const reduce = useReducedMotion();
+  const reduce = useReducedMotionSafe();
   const playing = inView && !hover && !focused && !paused && !reduce && device === 'desktop';
   const screen = screens[active];
 

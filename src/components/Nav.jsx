@@ -13,7 +13,8 @@ export default function Nav() {
   const [pastHero, setPastHero] = useState(false);
   const [atTop, setAtTop] = useState(true);
   const { scrollYProgress } = useScroll();
-  const isMac = /Mac|iPhone|iPad/.test(navigator.platform);
+  const [isMac, setIsMac] = useState(false);
+  useEffect(() => setIsMac(/Mac|iPhone|iPad/.test(navigator.platform)), []);
   useEffect(() => {
     const onScroll = () => {
       setPastHero((document.getElementById('top')?.getBoundingClientRect().bottom ?? 0) < 100);

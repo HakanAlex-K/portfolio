@@ -1,9 +1,10 @@
 ﻿import React, { useEffect, useState } from 'react';
-import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
+import { AnimatePresence, motion } from 'motion/react';
 import { ArrowDown, ArrowUpRight, FileText, Pause, Play } from 'lucide-react';
 import { profile } from '../data/profile.js';
 import { projects as allProjects } from '../data/projects.js';
 import { assetUrl } from '../lib/assets.js';
+import { useReducedMotionSafe } from './primitives.jsx';
 
 const projects = allProjects.filter(p => p.featured !== false);
 const highlights = [
@@ -18,7 +19,7 @@ export default function Hero() {
   const [held, setHeld] = useState(false);
   const [hidden, setHidden] = useState(false);
   const [paused, setPaused] = useState(false);
-  const reduce = useReducedMotion();
+  const reduce = useReducedMotionSafe();
   const playing = !paused && !held && !hidden && !reduce;
   const project = projects[current];
   const highlight = highlights[current];
