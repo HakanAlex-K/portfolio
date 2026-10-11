@@ -17,7 +17,7 @@ function useCommands(onCopied) {
       { group: 'Navigate', label: 'Blues Yachting platform', icon: Ship, run: () => go('blues') },
       { group: 'Navigate', label: 'VitalView research dashboard', icon: Cpu, run: () => go('vitalview') },
       { group: 'Navigate', label: 'Drexel Turkish Student Association website', icon: Users, run: () => go('drexel-tsa') },
-      { group: 'Navigate', label: 'UniTR university rankings', icon: GraduationCap, run: () => go('university-rankings') },
+      { group: 'Navigate', label: 'UniTR university explorer + AI search', icon: GraduationCap, run: () => go('unitr') },
       { group: 'Navigate', label: 'Hack Computer architecture', icon: Cpu, run: () => go('hack-computer') },
       { group: 'Navigate', label: 'About me', icon: User, run: () => go('about') },
       { group: 'Navigate', label: 'Experience', icon: FileText, run: () => go('experience') },

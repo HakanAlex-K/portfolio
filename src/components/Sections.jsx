@@ -6,10 +6,10 @@ import { assetUrl } from '../lib/assets.js';
 import { Reveal, Spotlight, useCopy } from './primitives.jsx';
 
 /* ---------- Tech marquee ---------- */
-const tech = ['C', 'Python', 'TypeScript', 'Verilog', 'React', 'Node.js', 'PostgreSQL', 'TensorFlow / Keras', 'ESP32', 'Docker'];
+const tech = ['C', 'Python', 'TypeScript', 'Verilog', 'React', 'Node.js', 'PostgreSQL', 'TensorFlow / Keras', 'Claude API', 'ESP32', 'Docker'];
 export function TechStrip() {
   return (
-    <div className="tech-strip container"><span className="eyebrow">Tools I use</span><ul aria-label="Technologies">{tech.slice(0, 10).map((t) => <li key={t}>{t}</li>)}</ul></div>
+    <div className="tech-strip container"><span className="eyebrow">Tools I use</span><ul aria-label="Technologies">{tech.map((t) => <li key={t}>{t}</li>)}</ul></div>
   );
 }
 
@@ -18,7 +18,7 @@ const principles = [
   ['Build across the stack', 'From React and Node.js to ESP32 firmware and Verilog. I like knowing how the pieces fit.'],
   ['Take responsibility after launch', 'At Blues, I owned deployment, backups, training, and support, not just the code.'],
   ['Understand the workflow', 'I work with the people using a system and turn their feedback into improvements.'],
-  ['Explore intelligent systems', 'Machine learning and AI agents that work inside real processes are where I’m heading next.'],
+  ['Explore intelligent systems', 'I built a tool-using Claude assistant for UniTR. AI agents that work inside real processes are where I’m heading next.'],
 ];
 
 export function About() {
@@ -72,6 +72,14 @@ const experience = [
       'Designed and built the association’s website, live since October 2026.',
       'Events, gallery, blog, and a guide to Türkiye.',
       'Board members manage content through a custom CMS (Next.js, TypeScript).',
+    ],
+  },
+  {
+    when: 'Jan 2025–now', org: 'UniTR', role: 'Sole developer · University explorer with AI search',
+    points: [
+      'Python ETL pipeline ingesting 12,239 programs across 224 universities from the YÖK Atlas API into a validated, checksummed dataset.',
+      'Next.js/TypeScript site and Express API for rank-based search, program history, and comparison, backed by 60+ tests.',
+      'Streaming Claude assistant with tool calling and server-verified citations; a 20-case eval suite took Haiku from 14/20 to 20/20.',
     ],
   },
   {

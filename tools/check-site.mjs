@@ -5,6 +5,7 @@ import { chromium } from 'playwright';
 import { projects } from '../src/data/projects.js';
 import { screens, phones } from '../src/data/blues.js';
 import { vvScreens } from '../src/data/vitalview-screens.js';
+import { unitrScreens } from '../src/data/unitr-screens.js';
 import { profile } from '../src/data/profile.js';
 
 const basePath = process.env.SITE_BASE || '/';
@@ -39,7 +40,7 @@ try {
 
   // Recruiter tools and AI screeners read the raw HTML without running JavaScript
   const rawText = (await (await fetch(url)).text()).replace(/<script[\s\S]*?<\/script>|<style[\s\S]*?<\/style>/g, ' ').replace(/<[^>]+>/g, ' ');
-  for (const text of [...projects.map(p => p.shortName), '18 modules', '600 features', 'Event Coordinator', 'Dean’s List', 'Coursework', profile.email]) {
+  for (const text of [...projects.map(p => p.shortName), '18 modules', '600 features', 'Event Coordinator', '12,239 programs', 'Dean’s List', 'Coursework', profile.email]) {
     assert.ok(rawText.includes(text), `Pre-rendered HTML is missing "${text}"`);
   }
   const noJs = await browser.newContext({viewport: {width: 1440, height: 1000}, javaScriptEnabled: false});
@@ -93,7 +94,7 @@ try {
     await page.locator('.lightbox').waitFor({state: 'detached'});
     await page.waitForFunction(selector => document.activeElement === document.querySelector(selector), selector);
   };
-  for (const [id, items] of [['blues', screens], ['vv', vvScreens]]) {
+  for (const [id, items] of [['blues', screens], ['vv', vvScreens], ['unitr', unitrScreens]]) {
     for (let i = 0; i < items.length; i++) {
       await page.locator(`#${id}-tab-${i}`).click();
       await page.waitForFunction(({id, expected}) => document.querySelector(`#${id}-panel img`)?.getAttribute('src') === expected, {id, expected: asset(items[i].src)});
@@ -108,16 +109,16 @@ try {
   await page.getByRole('button', {name: 'Mobile screens', exact: true}).click();
   await page.locator('#blues-panel .phones').waitFor();
   assert.equal(await page.locator('#blues-panel .phone').count(), phones.length);
-  for (const [id, expected] of [['drexel-tsa', '/img/tsa-full.webp'], ['university-rankings', projects[3].src], ['hack-computer', projects[4].src]]) await lightbox(`#${id} img[role="button"]`, expected);
-  for (const id of ['blues', 'drexel-tsa', 'university-rankings']) {
+  for (const [id, expected] of [['drexel-tsa', '/img/tsa-full.webp'], ['hack-computer', projects[4].src]]) await lightbox(`#${id} img[role="button"]`, expected);
+  for (const id of ['blues', 'drexel-tsa', 'unitr']) {
     await page.locator(`#${id} summary`).click();
     assert.equal(await page.locator(`#${id} details`).getAttribute('open'), '');
   }
-  for (const i of [0, 1, 2, 3, 4]) {
+  for (const i of [0, 1, 2, 3, 4, 5]) {
     if (await page.locator(`#xp-trigger-${i}`).getAttribute('aria-expanded') !== 'true') await page.locator(`#xp-trigger-${i}`).click();
     assert.equal(await page.locator(`#xp-trigger-${i}`).getAttribute('aria-expanded'), 'true');
   }
-  for (const [query, target] of [['experience', 'experience'], ['Hack Computer', 'hack-computer'], ['rankings', 'university-rankings']]) {
+  for (const [query, target] of [['experience', 'experience'], ['Hack Computer', 'hack-computer'], ['UniTR', 'unitr']]) {
     await page.locator('.kbd-btn').click();
     await page.locator('.cmdk input').fill(query);
     assert.equal(await page.locator('.cmdk-item').count(), 1);

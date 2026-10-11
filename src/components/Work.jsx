@@ -4,6 +4,7 @@ import { ArrowUpRight, ChevronDown, Github, Lock, Monitor, Pause, Play, Smartpho
 import { Browser, Reveal, Shot, useReducedMotionSafe } from './primitives.jsx';
 import { phones, screens } from '../data/blues.js';
 import { vvScreens } from '../data/vitalview-screens.js';
+import { unitrScreens } from '../data/unitr-screens.js';
 import { assetUrl } from '../lib/assets.js';
 import { projects } from '../data/projects.js';
 
@@ -150,12 +151,19 @@ function WebProjects() {
         <div className="web-project-visual"><Browser url="drexeltsa.vercel.app"><Shot src="/img/drexel-tsa.webp" full="/img/tsa-full.webp" alt="Drexel TSA homepage with its community introduction, association logo and events section." width={1440} height={900} /></Browser><span className="visual-caption">Live website · Student-facing homepage</span></div>
         <div className="web-project-bottom"><div className="stack-row">{['Next.js', 'React', 'TypeScript', 'Tailwind CSS'].map(t => <span key={t}>{t}</span>)}</div><details className="project-story"><summary>Behind the community hub <ChevronDown size={17} /></summary><div className="story-grid"><p>Runs on Vercel and Neon Postgres at $0/month.</p><p>Board login uses scrypt hashing, server-side sessions, CSRF checks, a nonce-based CSP, and rate limiting.</p></div></details></div>
       </Reveal>
-      <Reveal as="article" className="project web-project rankings-project" id="university-rankings" delay={.08}>
-        <div className="web-project-copy"><span className="world-label">04 / University discovery + data</span><h3>UniTR.<br /><em>Explore the options.</em></h3><p>Search Turkish universities and programs, backed by a Python pipeline for YÖKAtlas admissions data.</p><div className="web-story-pair"><div><strong>Search &amp; compare</strong><p>Filter by city and type; sort by rank, score, or name.</p></div><div><strong>Data engineering</strong><p>Reconcile records across 81 provinces and 4 years.</p></div></div></div>
-        <div className="web-project-visual"><Browser url="UniTR / University rankings"><Shot src="/img/university-rankings.webp" alt="UniTR rankings page with search, city and institution filters, and ranked university cards." width={1440} height={900} /></Browser><span className="visual-caption">Sample dataset · Not an official ranking</span></div>
-        <div className="web-project-bottom"><div className="stack-row">{['Next.js · TypeScript', 'Express', 'PostgreSQL', 'Python ETL'].map(t => <span key={t}>{t}</span>)}</div><details className="project-story"><summary>Behind the university explorer <ChevronDown size={17} /></summary><div className="story-grid"><p>A Python ETL loads YÖKAtlas data into PostgreSQL, using fuzzy matching to reconcile ~500 universities.</p><p>A TypeScript/Express API serves ranked university and program data. January 2025–present.</p></div></details></div>
-      </Reveal>
     </div>
+  );
+}
+
+function UniTR() {
+  return (
+    <article className="project chapter unitr-chapter" id="unitr">
+      <Reveal className="case-intro"><div className="case-heading"><div className="project-meta"><span className="tag">Personal project</span><span>January 2025–present · Sole developer</span></div><h3>04 / UniTR</h3><h4>Start from your rank.<br /><span>See where it got in.</span></h4></div><div className="case-setup"><p>A Turkish university explorer built on the official YÖK Atlas guide: 12,239 programs across 224 universities, with cut-off ranks, quotas, and tuition for 2023–2026. It shows which programs admitted a rank last year, without made-up scores or admission odds.</p><span className="role-note">Python ETL · Next.js · Express · Claude API</span></div></Reveal>
+      <Reveal className="story-change"><div><span className="story-label">Data</span><p>A Python ETL turns the YÖK Atlas API into a validated, checksummed dataset.</p></div><span className="story-change-arrow" aria-hidden="true">→</span><div><span className="story-label">AI search</span><p>A streaming Claude assistant turns questions into catalog searches with tool calls.</p></div><div className="story-result"><strong>20/20 evals.</strong><span>Claude Haiku went from 14/20 to 20/20, matching Opus at ~30× lower cost.</span></div></Reveal>
+      <Reveal className="demo-introduction"><div><span className="story-label">Product walkthrough</span><h4>Explore the interface.</h4></div><p>Real screens with official data. The interface is in Turkish.</p></Reveal>
+      <Reveal><ProductViewer id="unitr" label="UniTR screens" screens={unitrScreens} /></Reveal>
+      <Reveal className="project-bottom"><div className="stack-row">{['Python ETL', 'Next.js · TypeScript', 'Express', 'PostgreSQL', 'Claude API · tool calling', '60+ tests'].map(t => <span key={t}>{t}</span>)}</div><details className="project-story"><summary>Engineering decisions <ChevronDown size={18} /></summary><div className="story-grid"><div><span className="eyebrow">One query engine</span><p>The same search runs on the in-memory dataset or PostgreSQL, with identical results.</p></div><div><span className="eyebrow">Grounded answers</span><p>Figures come from the catalog, not the model, and the server verifies every citation.</p></div><div><span className="eyebrow">Measured with evals</span><p>20 test cases cover tool accuracy, grounding, and prompt injection across models.</p></div></div></details></Reveal>
+    </article>
   );
 }
 
@@ -174,14 +182,14 @@ function HackComputer() {
   );
 }
 
-const categories = ['Business software', 'Embedded + ML', 'Community website', 'Data platform', 'Digital logic'];
-const summaries = ['18-module platform', '1st place · Drexel Design', 'Website + board CMS', 'Admissions data pipeline', 'Stored-program computer'];
+const categories = ['Business software', 'Embedded + ML', 'Community website', 'Data + AI search', 'Digital logic'];
+const summaries = ['18-module platform', '1st place · Drexel Design', 'Website + board CMS', '12,239 programs · Claude', 'Stored-program computer'];
 export default function Work() {
   return (
     <section className="section" id="work"><div className="container">
-      <Reveal className="section-head work-heading"><div><span className="section-kicker">01 / Selected work</span><h2>Ideas into<br /><span>working systems.</span></h2></div><p>Five projects across production software, embedded sensing, data, and digital logic.</p></Reveal>
-      <div className="work-index">{projects.map((p, i) => <a key={p.id} className="world-card" href={'#' + p.id}><div className="world-card-top"><span className="mono">0{i + 1}</span><span>{categories[i]}</span><ArrowUpRight size={17} /></div><div className="world-card-image"><img src={assetUrl(p.src)} alt="" aria-hidden="true" width={1440} height={900} loading="lazy" /></div><div className="world-card-title"><strong>{i === 2 ? 'Drexel TSA' : i === 3 ? 'UniTR' : p.name}</strong><small>{summaries[i]}</small></div></a>)}</div>
-      <Blues /><VitalView /><WebProjects /><HackComputer />
+      <Reveal className="section-head work-heading"><div><span className="section-kicker">01 / Selected work</span><h2>Ideas into<br /><span>working systems.</span></h2></div><p>Five projects across production software, embedded sensing, data and AI, and digital logic.</p></Reveal>
+      <div className="work-index">{projects.map((p, i) => <a key={p.id} className="world-card" href={'#' + p.id}><div className="world-card-top"><span className="mono">0{i + 1}</span><span>{categories[i]}</span><ArrowUpRight size={17} /></div><div className="world-card-image"><img src={assetUrl(p.src)} alt="" aria-hidden="true" width={1440} height={900} loading="lazy" /></div><div className="world-card-title"><strong>{i === 2 ? 'Drexel TSA' : p.name}</strong><small>{summaries[i]}</small></div></a>)}</div>
+      <Blues /><VitalView /><WebProjects /><UniTR /><HackComputer />
     </div></section>
   );
 }

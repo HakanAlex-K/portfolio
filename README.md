@@ -39,6 +39,6 @@ Screenshots from the run end up in `test-results/`.
 
 - The Blues Yachting screenshots are from the real product, shared with permission. Customer names and figures are fictional.
 - The VitalView dashboard on the site is a later scikit-learn version of the project, running on synthetic signals. The original competition prototype used TensorFlow/Keras, and the site keeps the two separate.
-- UniTR screenshots use its sample dataset, so the rankings shown aren't official.
+- UniTR screenshots show official YÖK Atlas data, and the assistant answer is a real response. UniTR doesn't rank universities.
 
 Deployment notes are in [DEPLOYMENT.md](DEPLOYMENT.md).
