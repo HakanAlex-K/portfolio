@@ -15,5 +15,7 @@ export default defineConfig({
       return html.replaceAll('__SOCIAL_IMAGE__', `${siteUrl || base.replace(/\/$/, '')}/img/social-card.png`);
     },
   }],
+  // Vercel serves the analytics script only on its own deployments
+  define: { __VERCEL_ANALYTICS__: JSON.stringify(process.env.VERCEL === '1') },
   server: { port: 4173, host: '127.0.0.1' },
 });
