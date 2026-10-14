@@ -3,6 +3,9 @@
   "framework": "vite",
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
+  "rewrites": [
+    { "source": "/qr", "destination": "/index.html" }
+  ],
   "headers": [
     {
       "source": "/assets/(.*)",
