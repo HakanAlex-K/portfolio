@@ -149,7 +149,9 @@ try {
     // On failure, name the innermost elements that stick out so the cause is visible in CI logs
     const overflow = await page.evaluate(() => {
       if (document.documentElement.scrollWidth <= innerWidth) return null;
-      const out = [...document.querySelectorAll('body *')].filter(el => el.getBoundingClientRect().right > innerWidth + 0.5 && getComputedStyle(el).position !== 'fixed');
+      // Content inside a scrolling or clipping box does not widen the page
+      const clipped = el => { for (let p = el.parentElement; p && p !== document.body; p = p.parentElement) if (getComputedStyle(p).overflowX !== 'visible') return true; return false; };
+      const out = [...document.querySelectorAll('body *')].filter(el => el.getBoundingClientRect().right > innerWidth + 0.5 && getComputedStyle(el).position !== 'fixed' && !clipped(el));
       return out.filter(el => !out.some(o => o !== el && el.contains(o))).slice(0, 8)
         .map(el => `${el.tagName.toLowerCase()}.${String(el.className).split(' ')[0]} "${(el.textContent || '').trim().slice(0, 30)}" right=${Math.round(el.getBoundingClientRect().right)}`);
     });
