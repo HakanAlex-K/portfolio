@@ -149,11 +149,17 @@ try {
     // On failure, name the innermost elements that stick out so the cause is visible in CI logs
     const overflow = await page.evaluate(() => {
       if (document.documentElement.scrollWidth <= innerWidth) return null;
-      // Content inside a scrolling or clipping box does not widen the page
-      const clipped = el => { for (let p = el.parentElement; p && p !== document.body; p = p.parentElement) if (getComputedStyle(p).overflowX !== 'visible') return true; return false; };
-      const out = [...document.querySelectorAll('body *')].filter(el => el.getBoundingClientRect().right > innerWidth + 0.5 && getComputedStyle(el).position !== 'fixed' && !clipped(el));
-      return out.filter(el => !out.some(o => o !== el && el.contains(o))).slice(0, 8)
-        .map(el => `${el.tagName.toLowerCase()}.${String(el.className).split(' ')[0]} "${(el.textContent || '').trim().slice(0, 30)}" right=${Math.round(el.getBoundingClientRect().right)}`);
+      // Hide one child at a time and descend into the one whose removal ends the overflow
+      const fits = () => document.documentElement.scrollWidth <= innerWidth;
+      const path = [];
+      let node = document.body;
+      for (let depth = 0; depth < 25; depth++) {
+        const culprit = [...node.children].find(child => { const before = child.style.display; child.style.display = 'none'; const ok = fits(); child.style.display = before; return ok; });
+        if (!culprit) break;
+        path.push(`${culprit.tagName.toLowerCase()}${culprit.id ? '#' + culprit.id : ''}.${String(culprit.className).split(' ')[0]} (right=${Math.round(culprit.getBoundingClientRect().right)}, scrollW=${culprit.scrollWidth})`);
+        node = culprit;
+      }
+      return [`page ${document.documentElement.scrollWidth}px`, ...path];
     });
     assert.equal(overflow, null, `No horizontal overflow at ${width}px: ${overflow?.join(' | ')}`);
     assert.deepEqual(await page.locator('img').evaluateAll(imgs => imgs.filter(img => !img.naturalWidth).map(img => img.src)), []);
