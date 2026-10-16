@@ -171,14 +171,15 @@ h2 em, h3 em { font-style: normal; }
 .demo-video-controls button { display: grid; place-items: center; width: 36px; height: 36px; border: 1px solid rgba(244, 241, 230, .16); border-radius: 50%; background: rgba(13, 30, 24, .72); color: #f4f1e6; backdrop-filter: blur(10px); cursor: pointer; transition: background .2s var(--ease); }
 .demo-video-controls button:hover { background: rgba(13, 30, 24, .92); }
 .demo-video-controls button:focus-visible { outline: 2px solid #f4f1e6; outline-offset: 2px; }
-.demo-chapters { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin: 12px 0 0; padding: 0; list-style: none; }
+.demo-chapters { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; margin: 12px 0 0; padding: 0; list-style: none; }
 .demo-chapters button { display: block; width: 100%; padding: 6px 0 4px; border: 0; background: none; text-align: left; cursor: pointer; color: var(--dim); }
 .demo-chapter-bar { display: block; height: 2px; overflow: hidden; border-radius: 2px; background: var(--line-2); }
 .demo-chapter-bar > span { display: block; height: 100%; background: var(--accent); transform-origin: left; transition: transform .25s linear; }
-.demo-chapter-label { display: block; margin-top: 8px; font: 500 11px/1.4 var(--mono); letter-spacing: .05em; text-transform: uppercase; transition: color .2s var(--ease); }
+.demo-chapter-label { display: block; margin-top: 8px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font: 500 11px/1.4 var(--mono); letter-spacing: .05em; text-transform: uppercase; transition: color .2s var(--ease); }
 .demo-chapters button:hover, .demo-chapters button[aria-current] { color: var(--ink); }
 .demo-chapters button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 2px; }
 .demo-chapter-text { display: none; }
+.demo-chapter-name { display: none; }
 .demo-video figcaption { margin-top: 14px; font-size: 14px; line-height: 1.8; color: var(--muted); }
 .demo-video figcaption .story-label { display: inline; margin: 0 10px 0 0; }
 .vv-links { display: flex; align-items: center; flex-wrap: wrap; gap: 10px 14px; margin: 0 0 24px; }
@@ -461,4 +462,9 @@ h2 em, h3 em { font-style: normal; }
 @media (prefers-reduced-motion: reduce) {
   .entry-tab-fill { animation: none !important; }
   .world-card:hover .world-card-image img { transform: none; }
+}
+@media (max-width: 400px) {
+  .demo-chapters button { padding: 10px 0; }
+  .demo-chapter-label { display: none; }
+  .demo-chapter-name { display: block; margin-bottom: 4px; font: 500 11px/1.4 var(--mono); letter-spacing: .05em; text-transform: uppercase; color: var(--accent); }
 }

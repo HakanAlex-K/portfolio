@@ -162,7 +162,7 @@ function DemoVideo({ sources, poster, chapters, label, children }) {
           </li>
         ))}
       </ol>
-      <p className="demo-chapter-text" aria-live="off">{chapters[Math.max(current, 0)].text}</p>
+      <p className="demo-chapter-text" aria-live="off"><span className="demo-chapter-name">{chapters[Math.max(current, 0)].label}</span>{chapters[Math.max(current, 0)].text}</p>
       <figcaption>{children}</figcaption>
     </figure>
   );
