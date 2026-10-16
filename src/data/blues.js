@@ -44,3 +44,20 @@ export const phones = [
   { src: '/img/m-pipeline.webp', label: 'Sales, on the dock', alt: 'Sales pipeline on a phone.' },
   { src: '/img/m-dashboard.webp', label: 'Owners', alt: 'Dashboard on a phone.' },
 ];
+
+/* The portal demo video, recorded from the real app running on fictional demo data.
+ * Chapters match the captions burned into the video (seconds). */
+export const bluesDemo = {
+  poster: '/video/blues-portal-poster-v2.webp',
+  sources: [
+    { src: '/video/blues-portal-1080-v2.mp4', media: '(max-width: 900px)' },
+    { src: '/video/blues-portal-v2.mp4' },
+  ],
+  chapters: [
+    { start: 3, label: 'Customers', text: 'Add a customer once. Every quote, deal and message links back to them.' },
+    { start: 16.9, label: 'Inventory', text: 'Stock by location, units in transit, and inbound shipments tracked from supplier to arrival.' },
+    { start: 32.4, label: 'Pipeline', text: 'Every deal by stage, with stage age and quote-opened signals.' },
+    { start: 38.6, label: 'Quote', text: 'Prices, discounts, Turkish ÖTV and KDV, and live TCMB rates, then a branded PDF with an email and WhatsApp message ready.' },
+    { start: 49.8, end: 55.6, label: 'Customer', text: 'Each customer gets a personal proposal page, opened from WhatsApp. Every view shows up in the pipeline.' },
+  ],
+};

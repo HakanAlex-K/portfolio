@@ -55,7 +55,7 @@ try {
   await page.evaluate(() => Promise.race([document.fonts.ready, new Promise(resolve => setTimeout(resolve, 4000))]));
   assert.match(await page.title(), /Hakan Alex Kucukhuseyin/);
   assert.deepEqual(await page.locator('#work article.project').evaluateAll(els => els.map(el => el.id)), projects.map(p => p.id));
-  assert.equal(await page.locator('.work-index a').count(), 5);
+  assert.equal(await page.locator('.work-index a').count(), projects.length);
   assert.equal(await page.locator('.entry-play').count(), 0, 'Reduced motion disables rotation');
   assert.match(await page.locator('#blues .story-result').innerText(), /18 modules/);
   assert.match(await page.locator('#vitalview').innerText(), /600 features/);
@@ -109,16 +109,16 @@ try {
   await page.getByRole('button', {name: 'Mobile screens', exact: true}).click();
   await page.locator('#blues-panel .phones').waitFor();
   assert.equal(await page.locator('#blues-panel .phone').count(), phones.length);
-  for (const [id, expected] of [['drexel-tsa', '/img/tsa-full.webp'], ['hack-computer', projects[4].src]]) await lightbox(`#${id} img[role="button"]`, expected);
+  await lightbox('#drexel-tsa img[role="button"]', '/img/tsa-full.webp');
   for (const id of ['blues', 'drexel-tsa', 'unitr']) {
     await page.locator(`#${id} summary`).click();
     assert.equal(await page.locator(`#${id} details`).getAttribute('open'), '');
   }
-  for (const i of [0, 1, 2, 3, 4, 5]) {
+  for (const i of [0, 1, 2, 3, 4]) {
     if (await page.locator(`#xp-trigger-${i}`).getAttribute('aria-expanded') !== 'true') await page.locator(`#xp-trigger-${i}`).click();
     assert.equal(await page.locator(`#xp-trigger-${i}`).getAttribute('aria-expanded'), 'true');
   }
-  for (const [query, target] of [['experience', 'experience'], ['Hack Computer', 'hack-computer'], ['UniTR', 'unitr']]) {
+  for (const [query, target] of [['experience', 'experience'], ['VitalView research', 'vitalview'], ['UniTR', 'unitr']]) {
     await page.locator('.kbd-btn').click();
     await page.locator('.cmdk input').fill(query);
     assert.equal(await page.locator('.cmdk-item').count(), 1);
@@ -178,7 +178,7 @@ try {
   assert.deepEqual(errors, []);
   assert.deepEqual(failures, []);
   await fs.writeFile('test-results/checks.json', JSON.stringify({passed: true, basePath, projects: projects.map(p => p.id), widths: [1440, 1024, 768, 390, 320], errors, failures}, null, 2));
-  console.log(`PASS: pre-rendered HTML, no-JS view, hydration, résumé alignment, 5 projects, 5 widths, images, PDF, keyboard controls, navigation, clipboard, motion, metadata; base ${basePath}`);
+  console.log(`PASS: pre-rendered HTML, no-JS view, hydration, résumé alignment, ${projects.length} projects, 5 widths, images, PDF, keyboard controls, navigation, clipboard, motion, metadata; base ${basePath}`);
 } finally {
   await browser?.close();
   server?.kill();

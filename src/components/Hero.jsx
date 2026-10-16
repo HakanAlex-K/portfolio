@@ -9,9 +9,9 @@ import { useReducedMotionSafe } from './primitives.jsx';
 const projects = allProjects.filter(p => p.featured !== false);
 const highlights = [
   { label: 'Production software', description: 'An operating platform for a yacht dealership.', facts: [['18', 'integrated modules'], ['~85%', 'less quote preparation']] },
+  { label: 'Data + AI search', description: 'Official admissions data with a Claude search assistant.', facts: [['12,239', 'programs from YÖK Atlas'], ['20/20', 'on its LLM eval suite']] },
   { label: 'Embedded systems + ML', description: 'Optical sensing, inference, and a research dashboard.', facts: [['1st place', 'Freshman Engineering Design'], ['ESP32', 'sensor integration']] },
   { label: 'Community website', description: 'A student community, with tools to keep it running.', facts: [['Live', 'at Drexel University'], ['CMS', 'managed by the board']] },
-  { label: 'Data + AI search', description: 'Official admissions data with a Claude search assistant.', facts: [['12,239', 'programs from YÖK Atlas'], ['20/20', 'on its LLM eval suite']] },
 ];
 
 export default function Hero() {
