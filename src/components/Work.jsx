@@ -1,10 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion, useInView } from 'motion/react';
-import { ArrowUpRight, ChevronDown, Github, Lock, Monitor, Pause, Play, Smartphone, Trophy } from 'lucide-react';
+import { ArrowUpRight, ChevronDown, Github, Lock, Maximize2, Monitor, Pause, Play, Smartphone, Trophy } from 'lucide-react';
 import { Browser, Reveal, Shot, useReducedMotionSafe } from './primitives.jsx';
-import { phones, screens } from '../data/blues.js';
+import { bluesDemo, phones, screens } from '../data/blues.js';
 import { vvScreens } from '../data/vitalview-screens.js';
-import { unitrScreens } from '../data/unitr-screens.js';
+import { unitrDemo, unitrScreens } from '../data/unitr-screens.js';
 import { assetUrl } from '../lib/assets.js';
 import { projects } from '../data/projects.js';
 
@@ -111,6 +111,63 @@ function ProductViewer({ id, screens, phones, overlay, label }) {
 }
 
 
+const clamp01 = (v) => Math.min(1, Math.max(0, v));
+
+/* ================================================================== */
+/* Muted demo video: plays while on screen, waits for a click under    */
+/* reduced motion, and downloads nothing until it is first played      */
+/* ================================================================== */
+function DemoVideo({ sources, poster, chapters, label, children }) {
+  const ref = useRef(null);
+  const reduce = useReducedMotionSafe();
+  const inView = useInView(ref, { margin: '-15% 0px' });
+  const [wanted, setWanted] = useState(null); // null: follow the motion setting
+  const [playing, setPlaying] = useState(false);
+  const [time, setTime] = useState(0);
+  const shouldPlay = inView && (wanted ?? !reduce);
+  const ends = chapters.map((c, i) => c.end ?? chapters[i + 1].start);
+  const current = chapters.findIndex((c, i) => time >= c.start && time < ends[i]);
+
+  useEffect(() => {
+    const video = ref.current;
+    if (shouldPlay) video.play().catch(() => setPlaying(false));
+    else video.pause();
+  }, [shouldPlay]);
+
+  const fullscreen = () => {
+    const video = ref.current;
+    setWanted(true);
+    (video.requestFullscreen || video.webkitEnterFullscreen)?.call(video);
+  };
+  const seek = (i) => { ref.current.currentTime = chapters[i].start; setTime(chapters[i].start); setWanted(true); };
+
+  return (
+    <figure className="demo-video">
+      <div className="demo-video-frame">
+        <video ref={ref} muted loop playsInline preload="none" poster={assetUrl(poster)} aria-label={label} onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)} onTimeUpdate={(e) => setTime(e.currentTarget.currentTime)}>
+          {sources.map((s) => <source key={s.src} src={assetUrl(s.src)} type="video/mp4" media={s.media} />)}
+        </video>
+        <div className="demo-video-controls">
+          <button onClick={() => setWanted(!playing)} aria-label={playing ? 'Pause the demo video' : 'Play the demo video'}>{playing ? <Pause size={15} /> : <Play size={15} />}</button>
+          <button onClick={fullscreen} aria-label="Watch the demo full screen"><Maximize2 size={15} /></button>
+        </div>
+      </div>
+      <ol className="demo-chapters" aria-label="Chapters">
+        {chapters.map((c, i) => (
+          <li key={c.label}>
+            <button onClick={() => seek(i)} aria-current={i === current ? 'step' : undefined} title={c.text}>
+              <span className="demo-chapter-bar" aria-hidden="true"><span style={{ transform: `scaleX(${clamp01((time - c.start) / (ends[i] - c.start))})` }} /></span>
+              <span className="demo-chapter-label">{c.label}</span>
+            </button>
+          </li>
+        ))}
+      </ol>
+      <p className="demo-chapter-text" aria-live="off"><span className="demo-chapter-name">{chapters[Math.max(current, 0)].label}</span>{chapters[Math.max(current, 0)].text}</p>
+      <figcaption>{children}</figcaption>
+    </figure>
+  );
+}
+
 function Blues() {
   return (
     <article className="project chapter blues-chapter" id="blues">
@@ -118,8 +175,13 @@ function Blues() {
         <div className="case-heading"><div className="project-meta"><span className="tag tag-live"><i /> In daily use</span><span>Göcek & Bodrum, Türkiye</span></div><h3>01 / Blues Yachting</h3><h4>One platform.<br /><span>The whole operation.</span></h4></div>
         <div className="case-setup"><p>An 18-module platform for quoting, CRM, inventory, and payments. As sole engineer, I took it from requirements to deployment and support.</p><span className="role-note">Software Developer · 2023–24, 2025</span></div>
       </Reveal>
+      <Reveal>
+        <DemoVideo {...bluesDemo}
+          label="Demo: adding a customer, logging an inbound shipment and tracking it, moving a deal through the pipeline, building a quote with Turkish taxes and exchange rates, and the customer's proposal page on a phone.">
+          <span className="story-label">Product demo · 59 s</span>Recorded from the real portal with fictional demo data. The interface is in Turkish; captions translate.
+        </DemoVideo>
+      </Reveal>
       <Reveal className="story-change"><div><span className="story-label">Before</span><p>Spreadsheets, manual tax math, and quotes rebuilt for every sale.</p></div><span className="story-change-arrow" aria-hidden="true">→</span><div><span className="story-label">After</span><p>Shared records, automated pricing, and one-click PDF quotes.</p></div><div className="story-result"><strong>18 modules.</strong><span>~85% less quote preparation time.</span></div></Reveal>
-      <Reveal className="demo-introduction"><div><span className="story-label">Product walkthrough</span><h4>Explore the platform.</h4></div><p>Pick a workflow, or switch to mobile.</p></Reveal>
       <Reveal><ProductViewer id="blues" label="Portal screens" screens={screens} phones={phones} /><p className="permission"><Lock size={13} /> Real screens, shown with permission. Customer data is fictional.</p></Reveal>
       <Reveal className="project-bottom"><div className="stack-row">{['React 19', 'Node · Express · Zod', 'PostgreSQL', 'Docker · Caddy', 'GitHub Actions CI', 'Puppeteer PDF', 'PWA'].map(t => <span key={t}>{t}</span>)}</div><details className="project-story"><summary>Engineering decisions <ChevronDown size={18} /></summary><div className="story-grid"><div><span className="eyebrow">Consistent financial data</span><p>PDFs and customer pages share one template; each currency is tracked separately.</p></div><div><span className="eyebrow">Production reliability</span><p>CI runs end-to-end tests against a throwaway database on every push, plus staging and nightly backups.</p></div><div><span className="eyebrow">User feedback</span><p>I train the team and ship improvements from their feedback.</p></div></div></details></Reveal>
     </article>
@@ -131,7 +193,7 @@ const vv = projects.find((p) => p.id === 'vitalview');
 function VitalView() {
   return (
     <article className="project chapter vital-chapter" id="vitalview">
-      <Reveal className="case-intro"><div className="case-heading"><div className="project-meta"><span className="tag tag-gold"><Trophy size={13} /> 1st place · Freshman Engineering Design</span><span>March–June 2025 · Team Lead</span></div><h3>02 / VitalView</h3><h4>From optical signals<br /><span>to model inference.</span></h4></div><div className="case-setup"><p>A wearable sensing prototype: ESP32/PPG hardware, a Node.js API, TensorFlow/Keras inference, and a React dashboard. First place at Drexel’s Freshman Engineering Design competition.</p><span className="role-note">Team Lead · System integration</span></div></Reveal>
+      <Reveal className="case-intro"><div className="case-heading"><div className="project-meta"><span className="tag tag-gold"><Trophy size={13} /> 1st place · Freshman Engineering Design</span><span>March–June 2025 · Team Lead</span></div><h3>03 / VitalView</h3><h4>From optical signals<br /><span>to model inference.</span></h4></div><div className="case-setup"><p>A wearable sensing prototype: ESP32/PPG hardware, a Node.js API, TensorFlow/Keras inference, and a React dashboard. First place at Drexel’s Freshman Engineering Design competition.</p><span className="role-note">Team Lead · System integration</span></div></Reveal>
       <Reveal className="story-change vital-change"><div><span className="story-label">Integration</span><p>Sensing, capture, inference, and dashboard in one prototype.</p></div><span className="story-change-arrow" aria-hidden="true">→</span><div><span className="story-label">Signal validation</span><p>Reject flatline and low-amplitude readings before inference.</p></div><div className="story-result"><strong>600 features.</strong><span>IR/red signal vectors</span></div></Reveal>
       <Reveal className="demo-introduction"><div><span className="story-label">Research dashboard</span><h4>Inspect the later software iteration.</h4></div><p>The public demo, rebuilt with scikit-learn on synthetic signals.</p></Reveal>
       <Reveal className="vv-links"><a className="btn vv-demo" href={vv.url} target="_blank" rel="noreferrer">Open the live demo <ArrowUpRight size={16} /></a><a className="btn vv-repo" href={vv.repo} target="_blank" rel="noreferrer"><Github size={16} /> Source on GitHub</a></Reveal>
@@ -147,7 +209,7 @@ function WebProjects() {
   return (
     <div className="web-projects">
       <Reveal as="article" className="project web-project tsa-project" id="drexel-tsa">
-        <div className="web-project-copy"><div className="tsa-meta"><span className="tag tag-live"><i /> Live</span><span>Launched October 2026</span></div><span className="world-label">03 / Community website</span><h3>Drexel Turkish<br /><em>Student Association.</em></h3><p>I designed and built the association’s website for events, resources, and community updates.</p><div className="web-story-pair"><div><strong>Student experience</strong><p>Events, gallery, blog, and joining through DragonLink.</p></div><div><strong>Board management</strong><p>A CMS lets the board update events, posts, and photos.</p></div></div><div className="tsa-visit-row"><a className="btn tsa-visit" href={tsaUrl} target="_blank" rel="noreferrer">Visit the website <ArrowUpRight size={16} /></a></div></div>
+        <div className="web-project-copy"><div className="tsa-meta"><span className="tag tag-live"><i /> Live</span><span>Launched October 2026</span></div><span className="world-label">04 / Community website</span><h3>Drexel Turkish<br /><em>Student Association.</em></h3><p>I designed and built the association’s website for events, resources, and community updates.</p><div className="web-story-pair"><div><strong>Student experience</strong><p>Events, gallery, blog, and joining through DragonLink.</p></div><div><strong>Board management</strong><p>A CMS lets the board update events, posts, and photos.</p></div></div><div className="tsa-visit-row"><a className="btn tsa-visit" href={tsaUrl} target="_blank" rel="noreferrer">Visit the website <ArrowUpRight size={16} /></a></div></div>
         <div className="web-project-visual"><Browser url="drexeltsa.vercel.app"><Shot src="/img/drexel-tsa.webp" full="/img/tsa-full.webp" alt="Drexel TSA homepage with its community introduction, association logo and events section." width={1440} height={900} /></Browser><span className="visual-caption">Live website · Student-facing homepage</span></div>
         <div className="web-project-bottom"><div className="stack-row">{['Next.js', 'React', 'TypeScript', 'Tailwind CSS'].map(t => <span key={t}>{t}</span>)}</div><details className="project-story"><summary>Behind the community hub <ChevronDown size={17} /></summary><div className="story-grid"><p>Runs on Vercel and Neon Postgres at $0/month.</p><p>Board login uses scrypt hashing, server-side sessions, CSRF checks, a nonce-based CSP, and rate limiting.</p></div></details></div>
       </Reveal>
@@ -158,38 +220,28 @@ function WebProjects() {
 function UniTR() {
   return (
     <article className="project chapter unitr-chapter" id="unitr">
-      <Reveal className="case-intro"><div className="case-heading"><div className="project-meta"><span className="tag">Personal project</span><span>January 2025–present · Sole developer</span></div><h3>04 / UniTR</h3><h4>Start from your rank.<br /><span>See where it got in.</span></h4></div><div className="case-setup"><p>A Turkish university explorer built on the official YÖK Atlas guide: 12,239 programs across 224 universities, with cut-off ranks, quotas, and tuition for 2023–2026. It shows which programs admitted a rank last year, without made-up scores or admission odds.</p><span className="role-note">Python ETL · Next.js · Express · Claude API</span></div></Reveal>
+      <Reveal className="case-intro"><div className="case-heading"><div className="project-meta"><span className="tag">Personal project</span><span>January 2025–present · Sole developer</span></div><h3>02 / UniTR</h3><h4>Start from your rank.<br /><span>See where it got in.</span></h4></div><div className="case-setup"><p>A Turkish university explorer built on the official YÖK Atlas guide: 12,239 programs across 224 universities, with cut-off ranks, quotas, and tuition for 2023–2026. It shows which programs admitted a rank last year, without made-up scores or admission odds.</p><span className="role-note">Python ETL · Next.js · Express · Claude API</span></div></Reveal>
+      <Reveal>
+        <DemoVideo {...unitrDemo}
+          label="Demo: a question typed in Turkish becomes catalog searches, a streamed answer with numbered citations, and the official records behind them.">
+          <span className="story-label">AI assistant · 33 s</span>A real Claude Haiku answer, recorded from the app. The interface is in Turkish; captions translate.
+        </DemoVideo>
+      </Reveal>
       <Reveal className="story-change"><div><span className="story-label">Data</span><p>A Python ETL turns the YÖK Atlas API into a validated, checksummed dataset.</p></div><span className="story-change-arrow" aria-hidden="true">→</span><div><span className="story-label">AI search</span><p>A streaming Claude assistant turns questions into catalog searches with tool calls.</p></div><div className="story-result"><strong>20/20 evals.</strong><span>Claude Haiku went from 14/20 to 20/20, matching Opus at ~30× lower cost.</span></div></Reveal>
-      <Reveal className="demo-introduction"><div><span className="story-label">Product walkthrough</span><h4>Explore the interface.</h4></div><p>Real screens with official data. The interface is in Turkish.</p></Reveal>
       <Reveal><ProductViewer id="unitr" label="UniTR screens" screens={unitrScreens} /></Reveal>
       <Reveal className="project-bottom"><div className="stack-row">{['Python ETL', 'Next.js · TypeScript', 'Express', 'PostgreSQL', 'Claude API · tool calling', '60+ tests'].map(t => <span key={t}>{t}</span>)}</div><details className="project-story"><summary>Engineering decisions <ChevronDown size={18} /></summary><div className="story-grid"><div><span className="eyebrow">One query engine</span><p>The same search runs on the in-memory dataset or PostgreSQL, with identical results.</p></div><div><span className="eyebrow">Grounded answers</span><p>Figures come from the catalog, not the model, and the server verifies every citation.</p></div><div><span className="eyebrow">Measured with evals</span><p>20 test cases cover tool accuracy, grounding, and prompt injection across models.</p></div></div></details></Reveal>
     </article>
   );
 }
 
-function HackComputer() {
-  return (
-    <Reveal as="article" className="project hardware-project" id="hack-computer">
-      <div className="hardware-copy">
-        <div className="project-meta"><span className="tag">ECE 350</span><span>June–August 2026</span></div>
-        <span className="world-label">05 / Computer architecture</span>
-        <h3>A computer built<br /><em>from digital logic.</em></h3>
-        <p>A stored-program <strong>Hack computer in Verilog</strong>: ALU, registers, CPU control, memory, and memory-mapped screen and keyboard I/O, validated with Hack machine-language programs.</p>
-        <div className="stack-row">{['Verilog', 'Digital logic', 'Computer architecture', 'Memory-mapped I/O'].map(t => <span key={t}>{t}</span>)}</div>
-      </div>
-      <figure className="hardware-visual"><Shot src="/img/hack-computer.svg" alt="Conceptual architecture diagram showing instruction ROM feeding the Hack CPU, a program counter addressing ROM, and memory-mapped RAM, screen and keyboard I/O." width={1200} height={750} /><figcaption>Architecture overview · ECE 350 course project</figcaption></figure>
-    </Reveal>
-  );
-}
-
-const categories = ['Business software', 'Embedded + ML', 'Community website', 'Data + AI search', 'Digital logic'];
-const summaries = ['18-module platform', '1st place · Drexel Design', 'Website + board CMS', '12,239 programs · Claude', 'Stored-program computer'];
+const categories = ['Business software', 'Data + AI search', 'Embedded + ML', 'Community website'];
+const summaries = ['18-module platform', '12,239 programs · Claude', '1st place · Drexel Design', 'Website + board CMS'];
 export default function Work() {
   return (
     <section className="section" id="work"><div className="container">
-      <Reveal className="section-head work-heading"><div><span className="section-kicker">01 / Selected work</span><h2>Ideas into<br /><span>working systems.</span></h2></div><p>Five projects across production software, embedded sensing, data and AI, and digital logic.</p></Reveal>
-      <div className="work-index">{projects.map((p, i) => <a key={p.id} className="world-card" href={'#' + p.id}><div className="world-card-top"><span className="mono">0{i + 1}</span><span>{categories[i]}</span><ArrowUpRight size={17} /></div><div className="world-card-image"><img src={assetUrl(p.src)} alt="" aria-hidden="true" width={1440} height={900} loading="lazy" /></div><div className="world-card-title"><strong>{i === 2 ? 'Drexel TSA' : p.name}</strong><small>{summaries[i]}</small></div></a>)}</div>
-      <Blues /><VitalView /><WebProjects /><UniTR /><HackComputer />
+      <Reveal className="section-head work-heading"><div><span className="section-kicker">01 / Selected work</span><h2>Ideas into<br /><span>working systems.</span></h2></div><p>Four projects across production software, AI search, embedded sensing, and the web.</p></Reveal>
+      <div className="work-index">{projects.map((p, i) => <a key={p.id} className="world-card" href={'#' + p.id}><div className="world-card-top"><span className="mono">0{i + 1}</span><span>{categories[i]}</span><ArrowUpRight size={17} /></div><div className="world-card-image"><img src={assetUrl(p.src)} alt="" aria-hidden="true" width={1440} height={900} loading="lazy" /></div><div className="world-card-title"><strong>{p.id === 'drexel-tsa' ? p.shortName : p.name}</strong><small>{summaries[i]}</small></div></a>)}</div>
+      <Blues /><UniTR /><VitalView /><WebProjects />
     </div></section>
   );
 }

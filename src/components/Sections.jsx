@@ -90,13 +90,6 @@ const experience = [
     ],
   },
   {
-    when: 'Jun–Aug 2026', org: 'Hack Computer', role: 'Verilog CPU & memory system · ECE 350',
-    points: [
-      'Integrated ALU, registers, CPU control, and memory into a stored-program computer.',
-      'Memory-mapped screen and keyboard I/O, validated with machine-language programs.',
-    ],
-  },
-  {
     when: 'Expected Jun 2028', org: 'Drexel University', role: 'B.S. EE + CompE (double major) · Finance minor',
     points: [
       'GPA: 3.6 · Finance minor GPA: 4.0 · Dean’s List since September 2024.',
