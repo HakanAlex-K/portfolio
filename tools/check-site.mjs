@@ -146,8 +146,14 @@ try {
       for (let y = 0; y < document.body.scrollHeight; y += 600) { scrollTo(0, y); await new Promise(requestAnimationFrame); }
       scrollTo(0, 0);
     });
-    const overflow = await page.evaluate(() => document.documentElement.scrollWidth > innerWidth);
-    assert.equal(overflow, false, `No horizontal overflow at ${width}px`);
+    // On failure, name the innermost elements that stick out so the cause is visible in CI logs
+    const overflow = await page.evaluate(() => {
+      if (document.documentElement.scrollWidth <= innerWidth) return null;
+      const out = [...document.querySelectorAll('body *')].filter(el => el.getBoundingClientRect().right > innerWidth + 0.5 && getComputedStyle(el).position !== 'fixed');
+      return out.filter(el => !out.some(o => o !== el && el.contains(o))).slice(0, 8)
+        .map(el => `${el.tagName.toLowerCase()}.${String(el.className).split(' ')[0]} "${(el.textContent || '').trim().slice(0, 30)}" right=${Math.round(el.getBoundingClientRect().right)}`);
+    });
+    assert.equal(overflow, null, `No horizontal overflow at ${width}px: ${overflow?.join(' | ')}`);
     assert.deepEqual(await page.locator('img').evaluateAll(imgs => imgs.filter(img => !img.naturalWidth).map(img => img.src)), []);
     if (width === 1440 || width === 390) {
       await page.screenshot({path: `test-results/site-${width}.png`, fullPage: true});
